@@ -1,0 +1,2 @@
+== jRestful ==
+jQuery RESTful interface for Rails

@@ -1,2 +1,30 @@
-== jRestful ==
+== jRestful
 jQuery RESTful interface for Rails
+
+== Example
+  
+Simple:
+  $.Model.resource('Post'); // initialize $.Post 
+  p = $.Post.find(5); // find post with id = 5
+  p.title = "New Dummy Title";
+  p.save();
+
+Callbacks:
+  $.Post.find(5, function(post){
+    alert(post.title);
+  });
+
+== Features
+
+* find record
+* update record
+* create record
+* delete record
+* guessing rails restful urls by model name (thank to inflection.js)
+
+
+== Reqirements
+
+* jquery.js 
+* jquery.rest.js (requires: jquery.values.js, json2.js)
+* inflection.js

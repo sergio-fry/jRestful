@@ -48,6 +48,7 @@
       $[model_name.classify()] = $.extend({}, $.Model, {
         _singular: model_name.singularize().underscore(),
         _show_url: '/' + model_name.pluralize().underscore() + '/{id}.json',
+        _list_url: '/' + model_name.pluralize().underscore() + '.json',
         _update_url: '/' + model_name.pluralize().underscore() + '/{id}.json',
         _create_url: '/' + model_name.pluralize().underscore() + '.json',
         _delete_url: '/' + model_name.pluralize().underscore() + '/{id}.json'
@@ -66,6 +67,31 @@
     });
     return result;
   },
+  findFirst: function(attributes, callback){
+    var result = {};
+    this.findAll(attributes, function(collection){
+      result = $.extend(result, (collection.length > 0) ? collection[0] : {});
+      if( typeof callback == "function") callback(result);
+    });
+    return result;
+  },
+  findAll: function(attributes, callback){
+    var collection = new Array();
+
+    var model = this;
+    var item_template = $.extend({}, $.ModelObject);
+    item_template._model = model;
+
+    $.Read(this._list_url, attributes, function(data){ 
+      for ( row in data ) {
+        item = $.extend({}, item_template);
+        item.setAttributes(data[row][model._singular]); 
+        collection[collection.length] = item;
+      }
+      if( typeof callback == "function") callback(collection);
+    });
+    return collection;
+  },
     find: function(id, callback){
       var result = $.extend({}, $.ModelObject);
       var model = this;
@@ -79,6 +105,15 @@
   },
 update: function(id, attributes, callback){ var options = {id: id}; options[this._singular] = attributes; $.Update(this._update_url, options, {dataType: 'text', success: callback});},
 delete: function(id, callback){ $.Delete(this._delete_url, {id: id}, {dataType: 'text', success: callback});},
+deleteAll: function(attributes, callback){ 
+  var model = this;
+  this.findAll(attributes, function(collection){
+    for (row in collection){
+
+    $.Delete(model._delete_url, {id: collection[row].ID()}, {dataType: 'text', success: callback});
+  }
+});
+}
 
   }
 

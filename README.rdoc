@@ -4,14 +4,14 @@ jQuery RESTful interface for Rails
 == Example
   
 Simple:
-  $.Model.resource('Post'); // initialize $.Post 
-  p = $.Post.find(5); // find post with id = 5
-  p.title = "New Dummy Title";
+  BaseModel.prototype.generate_resource('post'); // initialize Post 
+  p = Post.prototype.find(5); // find post with id = 5
+  p.attributes.title = "New Dummy Title";
   p.save();
 
 Callbacks:
-  $.Post.find(5, function(post){
-    alert(post.title);
+  Post.prototypefind(5, function(post){
+    alert(post.attributes.title);
   });
 
 == Features

@@ -10,7 +10,7 @@ Simple:
   p.save();
 
 Callbacks:
-  Post.prototypefind(5, function(post){
+  Post.prototype.find(5, function(post){
     alert(post.attributes.title);
   });
 

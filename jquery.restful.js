@@ -48,7 +48,7 @@
   BaseModel.prototype.find = function(id, callback){
     var obj = new this.constructor();
     $.Read(this.show_url(), {id: id}, function(data){ 
-      obj.attributes = data[this.singular];
+      obj.attributes = $.extend({id: id}, data[this.singular]); 
       if($.isFunction(callback)) callback(obj);
     }.bind(this));
 

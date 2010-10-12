@@ -18,7 +18,7 @@
         this.find(this.attributes.id, function(obj){
           this.attributes = obj.attributes;
           if($.isFunction(callback)) callback(this);
-        }.bind(this))
+        }.bind(this), true)
       }
     };
 
@@ -45,9 +45,15 @@
   BaseModel.prototype.show_url = function(){ return '/' + this.singular.pluralize().underscore() + '/{id}.json'; };
   BaseModel.prototype.update_url = function(){ return '/' + this.singular.pluralize().underscore() + '/{id}.json'; };
 
-  BaseModel.prototype.find = function(id, callback){
+  BaseModel.prototype.find = function(id, callback, do_not_cache){
+    if(is_def(do_not_cache) && do_not_cache){
+      attrs = {id: id, r: Math.random()};
+    } else {
+      attrs = {id: id};
+    }
+
     var obj = new this.constructor();
-    $.Read(this.show_url(), {id: id}, function(data){ 
+    $.Read(this.show_url(), attrs, function(data){ 
       obj.attributes = $.extend({id: id}, data[this.singular]); 
       if($.isFunction(callback)) callback(obj);
     }.bind(this));

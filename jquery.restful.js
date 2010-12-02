@@ -23,10 +23,13 @@ BaseModel = function(attrs){
   this.reload = function(callback){
     if(!this.is_new()){
 
-      this.find(this.id(), function(obj){
-        this.attributes = obj.attributes;
-        if($.isFunction(callback)) callback(this);
-      }.bind(this), true)
+      this.find(this.id(), {
+        success: function(obj){
+          this.attributes = obj.attributes;
+          if($.isFunction(callback)) callback(this);
+        }.bind(this), 
+        cache: false
+      })
     }
   };
 
@@ -60,18 +63,31 @@ BaseModel.prototype.list_url = function(){ return '/' + this.singular.pluralize(
 BaseModel.prototype.show_url = function(){ return '/' + this.singular.pluralize().underscore() + '/{id}.json'; };
 BaseModel.prototype.update_url = function(){ return '/' + this.singular.pluralize().underscore() + '/{id}.json'; };
 
-BaseModel.prototype.find = function(id, callback, do_not_cache){
-  if(is_def(do_not_cache) && do_not_cache){
-    attrs = {id: id, r: Math.random()};
+BaseModel.prototype.find = function(id, options){
+  var default_options = {
+    success: $.noop,
+    error: $.noop,
+    cache: true
+  };
+
+  if($.isFunction(options)){
+    options = $.extend(default_options, {success: options});
   } else {
-    attrs = {id: id};
+    options = $.extend(default_options, options);
   }
+
+  if(options.cache){
+    attrs = {id: id};
+  } else {
+    attrs = {id: id, r: Math.random()};
+  }
+
 
   var obj = new this.constructor();
   $.Read(this.show_url(), attrs, function(data){ 
     obj.attributes = $.extend({id: id}, data[this.singular]); 
-    if($.isFunction(callback)) callback(obj);
-  }.bind(this));
+    options.success(obj);
+  }.bind(this), {error: options.error});
 
   return obj;
 };

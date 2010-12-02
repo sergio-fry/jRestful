@@ -7,19 +7,23 @@ BaseModel = function(attrs){
   this.after_update_callbacks = [];
   this.after_destroy_callbacks = [];
 
+  this.id = function(){
+    return this.attributes.id;
+  }
+
   this.destroy = function(callback){
-    $.Delete(this.delete_url(), {id: this.attributes.id}, {dataType: 'text', success: function(){
+    $.Delete(this.delete_url(), {id: this.id()}, {dataType: 'text', success: function(){
       this.after_destroy();
       if($.isFunction(callback)) callback(this);
     }.bind(this)});
   };
 
-  this.is_new = function(){ return $.is_blank(this.attributes.id) || (parseInt(this.attributes.id) == 0) };
+  this.is_new = function(){ return is_blank(this.id()) || (parseInt(this.id()) == 0) };
 
   this.reload = function(callback){
     if(!this.is_new()){
 
-      this.find(this.attributes.id, function(obj){
+      this.find(this.id(), function(obj){
         this.attributes = obj.attributes;
         if($.isFunction(callback)) callback(this);
       }.bind(this), true)
@@ -27,7 +31,7 @@ BaseModel = function(attrs){
   };
 
   this.save = function(callback){
-    attrs = {id: this.attributes.id};
+    attrs = {id: this.id()};
     attrs[this.singular] = this.attributes; 
 
     // dataType=text because of empty request
@@ -104,3 +108,20 @@ BaseModel.prototype.generate_resource = function(singular){
 }
 
 /////////////////////////////////////////////////////////////////////////////
+// Routines
+
+window.is_defined = function(obj){
+  return typeof(obj) != "undefined";
+}
+window.is_def = is_defined; 
+
+window.is_blank = function(obj){
+  return !is_def(obj) || obj == null || obj == "";
+}
+
+Function.prototype.bind = function (scope) {
+  var fn = this;
+  return function () {
+    return fn.apply(scope, arguments);
+  };
+};

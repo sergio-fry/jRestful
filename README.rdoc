@@ -28,3 +28,4 @@ Callbacks:
 * jquery.js 
 * jquery.rest.js (requires: jquery.values.js, json2.js)
 * inflection.js
+* async

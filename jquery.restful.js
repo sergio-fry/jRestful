@@ -20,35 +20,57 @@ BaseModel = function(attrs){
 
   this.is_new = function(){ return is_blank(this.id()) || (parseInt(this.id()) == 0) };
 
-  this.reload = function(callback){
+  this.reload = function(options){
     if(!this.is_new()){
+      var default_options = {
+        success: $.noop,
+        error: $.noop
+      };
+      if($.isFunction(options)){
+        options = $.extend({}, default_options, {success: options});
+      } else {
+        options = $.extend({}, default_options, {success: options.success, error: options.error});
+      }
 
       this.find(this.id(), {
         success: function(obj){
           this.attributes = obj.attributes;
-          if($.isFunction(callback)) callback(this);
-        }.bind(this), 
+          options.success(this);
+        }.bind(this),
+        error: options.error,
         cache: false
       })
     }
   };
 
-  this.save = function(callback){
+  this.save = function(options){
+    var default_options = {
+      success: $.noop,
+      error: $.noop
+    };
+
     attrs = {id: this.id()};
     attrs[this.singular] = this.attributes; 
+
+
+    if($.isFunction(options)){
+      options = $.extend({}, default_options, {success: options});
+    } else {
+      options = $.extend({}, default_options, {success: options.success, error: options.error});
+    }
 
     // dataType=text because of empty request
     $.Update(this.update_url(), attrs, { dataType: 'text', 
       success: function(){
-        async.series([
-          function(callback){
-            this.reload(callback);
+        this.reload({
+          success: function(obj){
+            options.success(obj);
+            this.after_update();
           }.bind(this)
-        ], function(){
-          this.after_update();
-          if($.isFunction(callback)) callback(this);
-        }.bind(this));
-      }.bind(this) 
+        });
+
+      }.bind(this),
+      error: options.error
     });
   };
 };

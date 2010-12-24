@@ -11,6 +11,37 @@ BaseModel = function(attrs){
     return this.attributes.id;
   }
 
+  this.create = function(attributes, options){
+    var default_options = {
+      success: $.noop,
+      error: $.noop
+    };
+
+    if(options == null) options = default_options;
+    if(attributes == null) attributes = {};
+
+    attrs = {};
+    attrs[this.singular] = attributes; 
+
+
+    if($.isFunction(options)){
+      options = $.extend({}, default_options, {success: options});
+    } else {
+      options = $.extend({}, default_options, {success: options.success, error: options.error});
+    }
+
+    var obj = new this.constructor();
+    $.Create(this.create_url(), attrs, { dataType: 'json', 
+      success: function(data){ 
+        obj.attributes = $.extend({}, data[this.singular]); 
+        options.success(obj);
+      }.bind(this),
+      error: options.error
+    });
+
+    return obj;
+  };
+
   this.destroy = function(callback){
     $.Delete(this.delete_url(), {id: this.id()}, {dataType: 'text', success: function(){
       this.after_destroy();
@@ -26,6 +57,8 @@ BaseModel = function(attrs){
         success: $.noop,
         error: $.noop
       };
+      if(options == null) options = default_options;
+
       if($.isFunction(options)){
         options = $.extend({}, default_options, {success: options});
       } else {

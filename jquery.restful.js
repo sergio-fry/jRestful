@@ -24,6 +24,7 @@ BaseModel = function(attrs){
     attrs[this.singular] = attributes; 
 
 
+    options = options || {};
     if($.isFunction(options)){
       options = $.extend({}, default_options, {success: options});
     } else {
@@ -86,6 +87,7 @@ BaseModel = function(attrs){
     attrs[this.singular] = this.attributes; 
 
 
+    options = options || {};
     if($.isFunction(options)){
       options = $.extend({}, default_options, {success: options});
     } else {

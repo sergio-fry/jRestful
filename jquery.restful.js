@@ -21,7 +21,7 @@ BaseModel = function(attrs){
     if(attributes == null) attributes = {};
 
     attrs = {};
-    attrs[this.singular] = attributes; 
+    attrs[this.singular] = attributes;
 
 
     options = options || {};
@@ -32,9 +32,9 @@ BaseModel = function(attrs){
     }
 
     var obj = new this.constructor();
-    $.Create(this.create_url(), attrs, { dataType: 'json', 
-      success: function(data){ 
-        obj.attributes = $.extend({}, data[this.singular]); 
+    $.Create(this.create_url(), attrs, { dataType: 'json',
+      success: function(data){
+        obj.attributes = $.extend({}, data[this.singular]);
         options.success(obj);
       }.bind(this),
       error: options.error
@@ -84,7 +84,7 @@ BaseModel = function(attrs){
     };
 
     attrs = {id: this.id()};
-    attrs[this.singular] = this.attributes; 
+    attrs[this.singular] = this.attributes;
 
 
     options = options || {};
@@ -95,7 +95,7 @@ BaseModel = function(attrs){
     }
 
     // dataType=text because of empty request
-    $.Update(this.update_url(), attrs, { dataType: 'text', 
+    $.Update(this.update_url(), attrs, { dataType: 'text',
       success: function(){
         this.reload({
           success: function(obj){
@@ -124,7 +124,7 @@ BaseModel.prototype.find = function(id, options){
   var default_options = {
     success: $.noop,
     error: $.noop,
-    cache: true
+    cache: false
   };
 
   if($.isFunction(options)){
@@ -141,8 +141,8 @@ BaseModel.prototype.find = function(id, options){
 
 
   var obj = new this.constructor();
-  $.Read(this.show_url(), attrs, function(data){ 
-    obj.attributes = $.extend({id: id}, data[this.singular]); 
+  $.Read(this.show_url(), attrs, function(data){
+    obj.attributes = $.extend({id: id}, data[this.singular]);
     options.success(obj);
   }.bind(this), {error: options.error});
 
@@ -186,7 +186,7 @@ BaseModel.prototype.generate_resource = function(singular){
 window.is_defined = function(obj){
   return typeof(obj) != "undefined";
 }
-window.is_def = is_defined; 
+window.is_def = is_defined;
 
 window.is_blank = function(obj){
   return !is_def(obj) || obj == null || obj == "";

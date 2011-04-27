@@ -32,6 +32,7 @@ BaseModel = function(attrs){
     }
 
     var obj = new this.constructor();
+    // TODO: replace with $.ajax
     $.Create(this.create_url(), attrs, { dataType: 'json',
       success: function(data){
         obj.attributes = $.extend({}, data[this.singular]);
@@ -44,6 +45,7 @@ BaseModel = function(attrs){
   };
 
   this.destroy = function(callback){
+    // TODO: replace with $.ajax
     $.Delete(this.delete_url(), {id: this.id()}, {dataType: 'text', success: function(){
       this.after_destroy();
       if($.isFunction(callback)) callback(this);
@@ -95,6 +97,7 @@ BaseModel = function(attrs){
     }
 
     // dataType=text because of empty request
+    // TODO: replace with $.ajax
     $.Update(this.update_url(), attrs, { dataType: 'text',
       success: function(){
         this.reload({
@@ -117,7 +120,7 @@ BaseModel = function(attrs){
 BaseModel.prototype.create_url = function(){ return '/' + this.singular.pluralize().underscore() + '.json'; };
 BaseModel.prototype.delete_url = function(){ return '/' + this.singular.pluralize().underscore() + '/{id}.json'; };
 BaseModel.prototype.list_url = function(){ return '/' + this.singular.pluralize().underscore() + '.json'; };
-BaseModel.prototype.show_url = function(){ return '/' + this.singular.pluralize().underscore() + '/{id}.json'; };
+BaseModel.prototype.show_url = function(){ return '/' + this.singular.pluralize().underscore() + '/'+this.id()+'.json'; };
 BaseModel.prototype.update_url = function(){ return '/' + this.singular.pluralize().underscore() + '/{id}.json'; };
 
 BaseModel.prototype.find = function(id, options){
@@ -141,10 +144,17 @@ BaseModel.prototype.find = function(id, options){
 
 
   var obj = new this.constructor();
-  $.Read(this.show_url(), attrs, function(data){
-    obj.attributes = $.extend({id: id}, data[this.singular]);
-    options.success(obj);
-  }.bind(this), {error: options.error});
+  $.ajax({url: this.show_url(),
+    data: attrs,
+    success: function(data){
+      data = $.parseJSON(data);
+      obj.attributes = $.extend({id: id}, data[this.singular]);
+      options.success.call(this, obj);
+    }.bind(this),
+    error: options.error,
+    dataType: "text",
+    type: "GET"
+  });
 
   return obj;
 };

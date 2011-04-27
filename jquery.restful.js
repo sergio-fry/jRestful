@@ -120,7 +120,7 @@ BaseModel = function(attrs){
 BaseModel.prototype.create_url = function(){ return '/' + this.singular.pluralize().underscore() + '.json'; };
 BaseModel.prototype.delete_url = function(){ return '/' + this.singular.pluralize().underscore() + '/{id}.json'; };
 BaseModel.prototype.list_url = function(){ return '/' + this.singular.pluralize().underscore() + '.json'; };
-BaseModel.prototype.show_url = function(){ return '/' + this.singular.pluralize().underscore() + '/'+this.id()+'.json'; };
+BaseModel.prototype.show_url = function(){ return '/' + this.singular.pluralize().underscore() + '/{id}.json'; };
 BaseModel.prototype.update_url = function(){ return '/' + this.singular.pluralize().underscore() + '/{id}.json'; };
 
 BaseModel.prototype.find = function(id, options){
@@ -144,7 +144,7 @@ BaseModel.prototype.find = function(id, options){
 
 
   var obj = new this.constructor();
-  $.ajax({url: this.show_url(),
+  $.ajax({url: this.show_url().replace("{id}", id),
     data: attrs,
     success: function(data){
       data = $.parseJSON(data);
